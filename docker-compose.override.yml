@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  gitlab:
+    ports:
+      - '8007:80'
+    volumes:
+      - ./gitlab/config:/etc/gitlab
+      - ./gitlab/data:/var/opt/gitlab

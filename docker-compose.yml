@@ -1,0 +1,28 @@
+## GitLab via Docker
+# Source: https://www.youtube.com/watch?v=FaHdMUAQgck
+
+# 1. enable GitLab;
+# 2. add reusable volume;
+# 3. v3 try to restore v2 from volumes: docker-volume, gitlab;
+# 4. wait 10-15 mins for new container setup;
+
+# docker ps -l
+# docker exec -it 31c7257d6df3 cat /etc/gitlab/initial_root_password
+
+# User: root
+# Password: JphFYOG3N54s3ldqixyNu1yMq4JQQfjozgj5K3TyWOg=
+
+# http://localhost:8003/root/sample v2
+# http://localhost:8005/root/sample v3 (clone of v1)
+
+# [?] standlone installation will not be migratable;
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:18.4.5-ce.0
+    restart: unless-stopped
+    # starts container at Docker Desktop reboot
+    # it takes 2-3 mins to start after reboot
+
+
+## Gitlab via PowserShell cannot be installed on Windows as standanone app

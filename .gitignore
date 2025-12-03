@@ -1,0 +1,4 @@
+docker-volume/*
+gitlab/*
+.vs/
+obj/
