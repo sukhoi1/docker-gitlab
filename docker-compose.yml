@@ -1,28 +1,42 @@
-## GitLab via Docker
-# Source: https://www.youtube.com/watch?v=FaHdMUAQgck
-
-# 1. enable GitLab;
-# 2. add reusable volume;
-# 3. v3 try to restore v2 from volumes: docker-volume, gitlab;
-# 4. wait 10-15 mins for new container setup;
-
-# docker ps -l
-# docker exec -it 31c7257d6df3 cat /etc/gitlab/initial_root_password
-
-# User: root
-# Password: JphFYOG3N54s3ldqixyNu1yMq4JQQfjozgj5K3TyWOg=
-
-# http://localhost:8003/root/sample v2
-# http://localhost:8005/root/sample v3 (clone of v1)
-
-# [?] standlone installation will not be migratable;
+version: '3.8'
 
 services:
   gitlab:
-    image: gitlab/gitlab-ce:18.4.5-ce.0
-    restart: unless-stopped
-    # starts container at Docker Desktop reboot
-    # it takes 2-3 mins to start after reboot
+    image: 'gitlab/gitlab-ce:18.6.1-ce.0'
+    restart: always
+    # Use the service name for internal hostname resolution
+    hostname: 'gitlab' 
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # Set the external URL here to match the host's port 80
+        external_url 'http://localhost:80'
+        gitlab_rails['initial_root_password'] = 'Qwerty_123' # Change this
+        # Add other configurations here
+    ports:
+      # Map the container's port 80 to the host's port 80
+      - '80:80' 
+      - '443:443'
+      - '22:22'
+    volumes:
+      - './gitlab/config:/etc/gitlab'
+      - './gitlab/logs:/var/log/gitlab'
+      - './gitlab/data:/var/opt/gitlab'
+    networks:
+      - gitlab-network
 
+  gitlab-runner:
+    # should ideally match the major and minor version of your GitLab instance
+    image: 'gitlab/gitlab-runner:v18.6.5'
+    container_name: gitlab-runner
+    restart: always
+    depends_on:
+      - gitlab
+    volumes:
+      - './gitlab-runner/config:/etc/gitlab-runner'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    networks:
+      - gitlab-network
 
-## Gitlab via PowserShell cannot be installed on Windows as standanone app
+networks:
+  gitlab-network:
+    driver: bridge
